@@ -1,0 +1,21 @@
+Seciurity concerns and their mitigations:
+1. Public access to s3 bucket:
+    All types of public access blocked so that the buckets objects are not exposed pubicly.
+2. EC2 instance are public accessible:
+    EC2 instance has been launched in a private subnet so it is not accessible pubicly .The only way to access is by creating a bastion host or to use AWS SSM .
+3. Policy attached to s3 bucket that allows execssive permissions:
+    We have atached a read-only S3 policy scoped strictly to the secure bucket.The Iam role needs to be attached to ec2 instance using ec2 instance profile.
+    Ex: A particular case where I have implemeted this is setting up grafana and loki(log aggregation tool) in a separate ec2 instance and the instance was supposed to access logs from s3 bucket 
+4. S3 encryption:
+    Enabled AES256 based encryption
+5. Logging of s3 bucket access:
+    Access logging enabled to track all bucket operations as iit is required while auditing unauthorized access .
+6. Wide open security groups:
+    Only allowing necessary outbound traffic, no inbound rules.Egress is required because it needs to sometimes access the internet.Ex: suppose the instance needs to download latest security patch for the os. 
+7. IMDS v1 not enabled that is vulnerable to ssrf:
+    SSRF vulnerability is prevented here by usage of IMDS v2 because a PUT request is first made and ssrf can be used in get requests like imds v1.
+8. EBS volumes are unencrypted:
+    EBS Volumes are properly encrypted  
+9. http_put_response_hop_limit =1 .this has been enabled to restricts how far metadata tokens can travel across network hops.The defaukt value is 1.This depends on the scenario
+10. We can also use AWS guard duty and cloudtrail for logging and audting but it is not required for such a minimal setup 
+
